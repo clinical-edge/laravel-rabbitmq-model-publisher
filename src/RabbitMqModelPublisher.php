@@ -3,20 +3,21 @@
 namespace CodeByKyle\RabbitMqModelPublisher;
 
 use Bschmitt\Amqp\Publisher;
+use Bschmitt\Amqp\Request;
 use Illuminate\Config\Repository;
 
-class RabbitMqModelPublisher
+class RabbitMqModelPublisher extends Publisher
 {
-    protected $publisher;
-
-    public function __construct(array $config)
-    {
-        $this->publisher = new Publisher(
-            new Repository($config)
+    public function publishEvent(ModelEvent $event) {
+        $this->publish(
+            $event->getRoutingKey(),
+            $event->toMessage()
         );
     }
 
-    public function test(){
-        return "Hello!";
+    public function test(array $testEvents){
+        foreach($testEvents as $modelEvent) {
+            $this->publishEvent($modelEvent);
+        }
     }
 }
